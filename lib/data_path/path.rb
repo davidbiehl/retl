@@ -10,13 +10,6 @@ module DataPath
       @source = source
       @steps = []
       @outlets = {}
-      
-      if block
-        build(&block)
-      end
-    end
-
-    def build(&block)
       PathBuilder.new(self, &block)
     end
 

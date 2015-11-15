@@ -68,9 +68,14 @@ describe DataPath do
           data[:type] == "child"
         end
       end
+
+      filter do |data|
+        data[:name] == "Whatever"
+      end
     end
 
     expect(path.outlets[:adults].count).to eq(2)
     expect(path.outlets[:children].count).to eq(1)
+    expect(path.count).to eq(0)
   end
 end

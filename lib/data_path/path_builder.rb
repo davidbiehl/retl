@@ -24,13 +24,7 @@ module DataPath
     end
 
     def outlet(name, &block)
-      outlet = Path.new(@path.source)
-
-      @path.steps.each do |step|
-        outlet.add_step step.dup
-      end
-      outlet.build(&block)
-      
+      outlet = Path.new(@path.to_a, &block)
       @path.add_outlet(name, outlet)
     end
   end
