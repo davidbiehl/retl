@@ -52,4 +52,25 @@ describe DataPath do
 
     expect(path.count).to eq(2)
   end
+
+  it "has multiple outlets" do 
+    path = DataPath::Path.new(source) do 
+      transform TypeTransformation
+
+      outlet :adults do 
+        filter do |data|
+          data[:type] == "adult"
+        end
+      end
+
+      outlet :children do 
+        filter do |data|
+          data[:type] == "child"
+        end
+      end
+    end
+
+    expect(path.outlets[:adults].count).to eq(2)
+    expect(path.outlets[:children].count).to eq(1)
+  end
 end
