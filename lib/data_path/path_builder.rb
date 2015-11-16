@@ -37,13 +37,18 @@ module DataPath
 
     def reject(predicate=nil, &block)
       predicate ||= block
-      filter { |data| !predicate.call(data) }
+      filter { |data, context| !context.execute_step(predicate, data) }
     end
 
     def calculate(key, action=nil, &block)
       action ||= block
-      transform { |data| data[key] = action.call(data) }
+      transform { |data, context| data[key] = context.execute_step(action, data) }
     end
     alias_method :calc, :calculate
+
+    def depends_on(name, source=nil, &block)
+      source ||= block
+      @path.add_dependency(name, source)
+    end
   end
 end

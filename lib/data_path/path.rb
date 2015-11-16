@@ -1,13 +1,15 @@
 require "data_path/path_builder"
 require "data_path/realization"
+require "data_path/context"
 
 module DataPath
   class Path
-    attr_reader :steps, :source
+    attr_reader :steps, :source, :dependencies
 
     def initialize(parent=nil, &block)
-      @steps   = []
-      @outlets = {}
+      @steps        = []
+      @outlets      = {}
+      @dependencies = {}
       
       add_step parent.dup if parent
       build(&block)       if block
@@ -30,14 +32,18 @@ module DataPath
       @outlets
     end
 
-    def call(data)
+    def call(data, context=Context.new(self))
       @steps.reduce(data) do |result, step|
-        step.call(result.dup)
+        context.execute_step(step, result.dup)
       end
     end
 
     def add_outlet(name, outlet)
       @outlets[name] = outlet 
+    end
+
+    def add_dependency(name, source)
+      @dependencies[name] = source
     end
 
     def realize(enumerable)

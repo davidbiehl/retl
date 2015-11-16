@@ -4,8 +4,8 @@ module DataPath
       @predicate = predicate
     end
 
-    def call(data)
-      throw(:skip) unless @predicate.call(data)
+    def call(data, context)
+      throw(:skip) unless context.execute_step(@predicate, data)
     end
   end
 end

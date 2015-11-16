@@ -4,8 +4,8 @@ module DataPath
       @action = action
     end
 
-    def call(data)
-      @action.call(data.dup)
+    def call(data, context)
+      context.execute_step(@action, data.dup)
       data
     end
   end

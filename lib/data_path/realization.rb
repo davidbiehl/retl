@@ -1,3 +1,5 @@
+require "data_path/context"
+
 module DataPath
   class Realization
     include Enumerable
@@ -7,9 +9,10 @@ module DataPath
     end
 
     def each(&block)
+      context = Context.new(@path)
       @enumerable.each do |data|
         catch(:skip) do 
-          yield @path.call(data)
+          yield @path.call(data, context)
         end
       end
     end

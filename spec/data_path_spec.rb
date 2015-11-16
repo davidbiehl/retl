@@ -131,4 +131,26 @@ describe DataPath do
 
     path.realize(source)
   end
+
+  it "can depend on other data" do 
+    path = DataPath::Path.new do 
+      depends_on(:gender_names) do 
+        {"M" => "Male", "F" => "Female"}
+      end
+
+      calc(:gender_name) do |data|
+        gender_names[data[:gender]] || "Unknown"
+      end
+    end
+
+    result = path.realize(source)
+
+    result.each do |data|
+      expect(data).to have_key(:gender_name)
+
+      if data[:name] == "David"
+        expect(data[:gender_name]).to eq("Male")
+      end
+    end
+  end
 end
