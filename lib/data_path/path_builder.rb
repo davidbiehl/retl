@@ -23,6 +23,7 @@ module DataPath
       predicate ||= block
       step(FilterStep.new(predicate))
     end
+    alias_method :select, :filter
 
     def outlet(name, &block)
       outlet = Path.new(@path, &block)
@@ -32,6 +33,11 @@ module DataPath
     def inspect(action=nil, &block)
       action ||= block
       step(InspectStep.new(action))
+    end
+
+    def reject(predicate=nil, &block)
+      predicate ||= block
+      filter { |data| !predicate.call(data) }
     end
   end
 end

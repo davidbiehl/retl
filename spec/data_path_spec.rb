@@ -53,6 +53,18 @@ describe DataPath do
     expect(path.realize(source).count).to eq(2)
   end
 
+  it "rejects data" do 
+    path = DataPath::Path.new do 
+      transform TypeTransformation
+
+      reject do |data|
+        data[:type] == "child"
+      end
+    end
+
+    expect(path.realize(source).count).to eq(2)
+  end
+
   it "has multiple outlets" do 
     path = DataPath::Path.new do 
       transform TypeTransformation
@@ -64,7 +76,7 @@ describe DataPath do
       end
 
       outlet :children do 
-        filter do |data|
+        select do |data|
           data[:type] == "child"
         end
       end
