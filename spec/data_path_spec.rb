@@ -78,4 +78,21 @@ describe DataPath do
     expect(path.outlets[:children].realize(source).count).to eq(1)
     expect(path.realize(source).count).to eq(0)
   end
+
+  it "can inspect data without changing it" do
+    path = DataPath::Path.new do 
+      inspect do |data|
+        data[:other] = "awesome"
+        expect(data).to not_have_key(:type)
+        data
+      end
+      
+      transform TypeTransformation
+
+      inspect do |data|
+        expect(data).to have_key(:type)
+        expect(data).to not_have_key(:other)
+      end
+    end
+  end
 end

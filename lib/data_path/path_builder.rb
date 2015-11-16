@@ -1,5 +1,6 @@
 require "data_path/filter_step"
 require "data_path/transform_step"
+require "data_path/inspect_step"
 
 module DataPath
   class PathBuilder
@@ -26,6 +27,11 @@ module DataPath
     def outlet(name, &block)
       outlet = Path.new(@path, &block)
       @path.add_outlet(name, outlet)
+    end
+
+    def inspect(action=nil, &block)
+      action ||= block
+      step(InspectStep.new(action))
     end
   end
 end
