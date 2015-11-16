@@ -24,7 +24,7 @@ module DataPath
     end
 
     def outlet(name, &block)
-      outlet = Path.new(@path.to_a, &block)
+      outlet = Path.new(@path, &block)
       @path.add_outlet(name, outlet)
     end
   end

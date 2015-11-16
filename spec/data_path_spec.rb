@@ -22,27 +22,27 @@ describe DataPath do
   end
 
   it "transforms data" do 
-    path = DataPath::Path.new(source) do 
+    path = DataPath::Path.new do 
       transform TypeTransformation
     end
 
-    path.each do |data|
+    path.realize(source).each do |data|
       expect(data).to have_key(:type)
     end
   end
 
   it "replaces data" do 
-    path = DataPath::Path.new(source) do 
+    path = DataPath::Path.new do 
       step do |data|
         data[:age]
       end
     end
 
-    expect(path.to_a).to eq([33, 35, 5])
+    expect(path.realize(source).to_a).to eq([33, 35, 5])
   end
 
   it "filters data" do 
-    path = DataPath::Path.new(source) do 
+    path = DataPath::Path.new do 
       transform TypeTransformation
 
       filter do |data|
@@ -50,11 +50,11 @@ describe DataPath do
       end
     end
 
-    expect(path.count).to eq(2)
+    expect(path.realize(source).count).to eq(2)
   end
 
   it "has multiple outlets" do 
-    path = DataPath::Path.new(source) do 
+    path = DataPath::Path.new do 
       transform TypeTransformation
 
       outlet :adults do 
@@ -74,8 +74,8 @@ describe DataPath do
       end
     end
 
-    expect(path.outlets[:adults].count).to eq(2)
-    expect(path.outlets[:children].count).to eq(1)
-    expect(path.count).to eq(0)
+    expect(path.outlets[:adults].realize(source).count).to eq(2)
+    expect(path.outlets[:children].realize(source).count).to eq(1)
+    expect(path.realize(source).count).to eq(0)
   end
 end
