@@ -107,4 +107,28 @@ describe DataPath do
       end
     end
   end
+
+  it "can calculate single keys" do 
+    rspec = self
+
+    path = DataPath::Path.new do 
+      calculate(:upper_name) do |data|
+        data[:name].upcase
+      end
+
+      inspect do |data|
+        rspec.expect(data[:upper_name]).to rspec.eq(data[:name].upcase)
+      end
+
+      calc(:lower_name) do |data|
+        data[:name].downcase
+      end
+
+      inspect do |data|
+        rspec.expect(data[:lower_name]).to rspec.eq(data[:name].downcase)
+      end
+    end
+
+    path.realize(source)
+  end
 end

@@ -39,5 +39,11 @@ module DataPath
       predicate ||= block
       filter { |data| !predicate.call(data) }
     end
+
+    def calculate(key, action=nil, &block)
+      action ||= block
+      transform { |data| data[key] = action.call(data) }
+    end
+    alias_method :calc, :calculate
   end
 end
