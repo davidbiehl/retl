@@ -28,9 +28,8 @@ module DataPath
     end
     alias_method :select, :filter
 
-    def outlet(name, &block)
-      outlet = Path.new(@path, &block)
-      @path.add_outlet(name, outlet)
+    def fork(name, &block)
+      @path.add_fork(name, &block)
     end
 
     def inspect(action=nil, &block)

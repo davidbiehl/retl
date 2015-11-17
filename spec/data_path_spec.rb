@@ -70,17 +70,17 @@ describe DataPath do
     expect(path.realize(source).count).to eq(2)
   end
 
-  it "has multiple outlets" do 
+  it "forks into alternate paths" do 
     path = DataPath::Path.new do 
       transform TypeTransformation
 
-      outlet :adults do 
+      fork :adults do 
         filter do |data|
           data[:type] == "adult"
         end
       end
 
-      outlet :children do 
+      fork :children do 
         select do |data|
           data[:type] == "child"
         end
@@ -91,8 +91,8 @@ describe DataPath do
       end
     end
 
-    expect(path.outlets[:adults].realize(source).count).to eq(2)
-    expect(path.outlets[:children].realize(source).count).to eq(1)
+    expect(path.forks[:adults].realize(source).count).to eq(2)
+    expect(path.forks[:children].realize(source).count).to eq(1)
     expect(path.realize(source).count).to eq(0)
   end
 

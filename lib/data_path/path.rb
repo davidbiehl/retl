@@ -37,18 +37,18 @@ module DataPath
   #   path.realize(data)
   #
   class Path
-    attr_reader :steps, :source, :dependencies
+    attr_reader :steps, :source, :dependencies, :forks
 
     # Initializes a new Path
     #
     # @param parent [Path] - a Path to inherit from
     def initialize(parent=nil, &block)
       @steps        = []
-      @outlets      = {}
+      @forks        = {}
       @dependencies = {}
       
       add_step parent.dup, handler: ExplodeHandler if parent
-      build(&block)       if block
+      build(&block) if block
     end
 
     # Builds a Path with the PathBuilder DSL
@@ -64,8 +64,8 @@ module DataPath
     # as well. That was if additional steps are added to the original Path
     # they won't be part of the copied Path.
     def initialize_copy(source)
-      @steps   = source.steps.dup
-      @outlets = {}
+      @steps = source.steps.dup
+      @forks = {}
     end
 
     # Adds a step to the Path
@@ -80,13 +80,6 @@ module DataPath
     # @return [void]
     def add_step(step, handler: StepHandler)
       @steps << handler.new(step)
-    end
-
-    # Accessor for the Path's outlets
-    #
-    # @return [Hash<name, Path>] 
-    def outlets
-      @outlets
     end
 
     # Execuutes the Path with the given data
@@ -110,25 +103,27 @@ module DataPath
       end
     end
 
-    # Adds an outlet to the Path
+    # Adds an fork to the Path
     #
-    # Outlets can be accessed via #outlets
+    # Forks can be accessed via #forks
     #
     # @example
-    #   path.add_outlet(:river, other_path)
-    #   path.outlets[:river]
+    #   path.add_fork(:river) do 
+    #     filter { |data| data[:is_wet] }
+    #   end
+    #   path.forks[:river]
     #
-    # @param name   [Symbol] the name of the outlet
-    # @param outlet [Path]   the Path of the other outlet
+    # @param name [Symbol] the name of the fork
     #
     # @return [void]
-    def add_outlet(name, outlet)
-      @outlets[name] = outlet 
+    def add_fork(name, &block)
+      fork = Path.new(self, &block)
+      @forks[name] = fork 
     end
 
     # Adds a depdency to the Path
     #
-    # @param name [Symbol] the name of the outlet 
+    # @param name [Symbol] the name of the dependency
     #   (should be a valid Ruby method)
     # @param source [#call] a callable object that will return the depdency
     #
