@@ -1,6 +1,8 @@
 require "data_path/path_builder"
 require "data_path/realization"
 require "data_path/context"
+require "data_path/step_handler"
+require "data_path/explode_handler"
 
 module DataPath
   # A Path is a blueprint for transforming data
@@ -45,7 +47,7 @@ module DataPath
       @outlets      = {}
       @dependencies = {}
       
-      add_step parent.dup if parent
+      add_step parent.dup, handler: ExplodeHandler if parent
       build(&block)       if block
     end
 
@@ -76,8 +78,8 @@ module DataPath
     # @param step [#call(data)] the step to take
     #
     # @return [void]
-    def add_step(step)
-      @steps << step
+    def add_step(step, handler: StepHandler)
+      @steps << handler.new(step)
     end
 
     # Accessor for the Path's outlets
@@ -92,13 +94,19 @@ module DataPath
     # Currently the DSL mostly supports Hash based data, so this expects a 
     # Hash.
     #
+    # Since a piece of data can now be exploded, this method will always
+    # return an Array. 
+    #
     # @param data    [Hash]    the data that will be transformed by the Path
     # @param context [Context] the execution context for the transformation
     #
-    # @return [Hash] the transformed data
+    # @return [Array<Hash>] the transformed data
     def call(data, context=Context.new(self))
-      @steps.reduce(data) do |result, step|
-        context.execute_step(step, result.dup)
+      @steps.reduce([data]) do |queue, handler|
+        queue.each do |data|
+          handler.push_in(data, context)
+        end
+        handler.output
       end
     end
 

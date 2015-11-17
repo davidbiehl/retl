@@ -1,6 +1,9 @@
-require "data_path/filter_step"
-require "data_path/transform_step"
-require "data_path/inspect_step"
+require "data_path/step_handler"
+require "data_path/transform_handler"
+require "data_path/filter_handler"
+require "data_path/inspect_handler"
+require "data_path/explode_handler"
+
 
 module DataPath
   class PathBuilder
@@ -9,19 +12,19 @@ module DataPath
       instance_eval(&block)
     end
 
-    def step(step=nil, &block)
+    def step(step=nil, handler: StepHandler, &block)
       step ||= block
-      @path.add_step step
+      @path.add_step step, handler: handler
     end
 
     def transform(action=nil, &block)
       action ||= block
-      step(TransformStep.new(action))
+      step(action, handler: TransformHandler)
     end
 
     def filter(predicate=nil, &block)
       predicate ||= block
-      step(FilterStep.new(predicate))
+      step(predicate, handler: FilterHandler)
     end
     alias_method :select, :filter
 
@@ -32,7 +35,7 @@ module DataPath
 
     def inspect(action=nil, &block)
       action ||= block
-      step(InspectStep.new(action))
+      step(action, handler: InspectHandler)
     end
 
     def reject(predicate=nil, &block)
@@ -49,6 +52,11 @@ module DataPath
     def depends_on(name, source=nil, &block)
       source ||= block
       @path.add_dependency(name, source)
+    end
+
+    def explode(action=nil, &block)
+      action ||= block
+      step(action, handler: ExplodeHandler)
     end
   end
 end

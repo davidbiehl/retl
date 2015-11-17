@@ -11,8 +11,8 @@ module DataPath
     def each(&block)
       context = Context.new(@path)
       @enumerable.each do |data|
-        catch(:skip) do 
-          yield @path.call(data, context)
+        @path.call(data, context).each do |data|
+          yield data
         end
       end
     end

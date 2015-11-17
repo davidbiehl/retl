@@ -97,20 +97,23 @@ describe DataPath do
   end
 
   it "can inspect data without changing it" do
+    rspec = self
     path = DataPath::Path.new do 
       inspect do |data|
         data[:other] = "awesome"
-        expect(data).to not_have_key(:type)
+        rspec.expect(data).to_not rspec.have_key(:type)
         data
       end
       
       transform TypeTransformation
 
       inspect do |data|
-        expect(data).to have_key(:type)
-        expect(data).to not_have_key(:other)
+        rspec.expect(data).to rspec.have_key(:type)
+        rspec.expect(data).to_not rspec.have_key(:other)
       end
     end
+
+    path.realize(source).to_a
   end
 
   it "can calculate single keys" do 
@@ -185,5 +188,19 @@ describe DataPath do
 
      expect(sum.sum).to eq(68)
     end
+  end
+
+  it "can explode data" do 
+    path = DataPath::Path.new do 
+      transform TypeTransformation
+      explode do |data|
+        3.times.map do |i|
+          data[:set] = i
+          data
+        end
+      end
+    end
+
+    expect(path.realize(source).count).to eq(9)
   end
 end
