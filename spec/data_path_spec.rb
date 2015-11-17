@@ -158,4 +158,32 @@ describe DataPath do
       end
     end
   end
+
+  it "can load data to a destination" do 
+    class SumReduction
+      attr_reader :sum
+
+      def initialize(key)
+        @key   = key
+        @sum   = 0
+        @mutex = Mutex.new
+      end
+
+      def <<(data)
+        @mutex.synchronize { @sum += data[@key] }
+      end
+    end
+
+    path = DataPath::Path.new do 
+      transform TypeTransformation
+      filter { |data| data[:type] == "adult" }
+    end
+
+    SumReduction.new(:age).tap do |sum|
+     result = path.realize(source)
+     result.load_into(sum)
+
+     expect(sum.sum).to eq(68)
+    end
+  end
 end

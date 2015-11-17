@@ -16,5 +16,19 @@ module DataPath
         end
       end
     end
+
+    def load_into(*destinations)
+      destinations = Array(destinations)
+
+      each do |data|
+        destinations.each do |destination|
+          destination << data
+        end
+      end
+
+      destinations.each do |destination|
+        destination.close if destination.respond_to?(:close)
+      end
+    end
   end
 end
