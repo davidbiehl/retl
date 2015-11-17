@@ -50,7 +50,12 @@ describe DataPath do
       end
     end
 
-    expect(path.realize(source).count).to eq(2)
+    result = path.realize(source)
+
+    expect(result.count).to eq(2)
+    result.each do |data|
+      expect(data).to include(type: "adult")
+    end
   end
 
   it "rejects data" do 

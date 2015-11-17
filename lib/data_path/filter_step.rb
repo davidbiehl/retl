@@ -5,7 +5,8 @@ module DataPath
     end
 
     def call(data, context)
-      throw(:skip) unless context.execute_step(@predicate, data)
+      throw(:skip) unless context.execute_step(@predicate, data.dup)
+      data
     end
   end
 end
