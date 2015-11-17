@@ -162,6 +162,24 @@ describe DataPath do
     end
   end
 
+  it "injects dependencies when the path is realized" do 
+    rspec = self
+
+    path = DataPath::Path.new do 
+      depends_on(:weather) do |options|
+        options[:weather] || (raise ArgumentError, "This path depends on the weather")
+      end
+
+      inspect do |data|
+        rspec.expect(weather).to rspec.eq("rainy")
+      end
+    end
+
+    path.realize(source, weather: "rainy").to_a
+
+    expect { path.realize(source).to_a }.to raise_error(ArgumentError)
+  end
+
   it "can load data to a destination" do 
     class SumReduction
       attr_reader :sum

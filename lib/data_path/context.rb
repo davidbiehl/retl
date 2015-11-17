@@ -1,10 +1,10 @@
 module DataPath
   class Context
-    def initialize(path)
+    def initialize(path, options={})
       @path  = path
 
       @path.dependencies.each do |name, dependency|
-        self.class.send(:define_method, name) { dependency.call }
+        self.class.send(:define_method, name) { dependency.call(options) }
       end
     end
 

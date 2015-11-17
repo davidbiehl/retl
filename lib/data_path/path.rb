@@ -140,10 +140,11 @@ module DataPath
     # Executes the Path with data
     #
     # @param [#each] the data that will be processed by the Path
+    # @option options that will be passed to #depends_on for the context
     #
     # @return [Realization] the realization of the Path with the data
-    def realize(enumerable)
-      Realization.new(enumerable, self)
+    def realize(enumerable, options={})
+      Realization.new(enumerable, self, options)
     end
   end
 end

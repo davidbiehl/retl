@@ -4,12 +4,12 @@ module DataPath
   class Realization
     include Enumerable
     
-    def initialize(enumerable, path)
-      @enumerable, @path = enumerable, path
+    def initialize(enumerable, path, options={})
+      @enumerable, @path, @options = enumerable, path, options
     end
 
     def each(&block)
-      context = Context.new(@path)
+      context = Context.new(@path, @options)
       @enumerable.each do |data|
         @path.call(data, context).each do |data|
           yield data
