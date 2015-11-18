@@ -1,7 +1,7 @@
 require "data_path/context"
 
 module DataPath
-  class Realization
+  class Transformation
     include Enumerable
     
     def initialize(enumerable, path, options={})
@@ -18,7 +18,7 @@ module DataPath
     end
 
     def forks(name)
-      @path.forks(name).realize(@enumerable, @options)
+      @path.forks(name).transform(@enumerable, @options)
     end
 
     def load_into(*destinations)

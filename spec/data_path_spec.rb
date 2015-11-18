@@ -26,7 +26,7 @@ describe DataPath do
       transform TypeTransformation
     end
 
-    path.realize(source).each do |data|
+    path.transform(source).each do |data|
       expect(data).to have_key(:type)
     end
   end
@@ -38,7 +38,7 @@ describe DataPath do
       end
     end
 
-    expect(path.realize(source).to_a).to eq([33, 35, 5])
+    expect(path.transform(source).to_a).to eq([33, 35, 5])
   end
 
   it "filters data" do 
@@ -50,7 +50,7 @@ describe DataPath do
       end
     end
 
-    result = path.realize(source)
+    result = path.transform(source)
 
     expect(result.count).to eq(2)
     result.each do |data|
@@ -67,7 +67,7 @@ describe DataPath do
       end
     end
 
-    expect(path.realize(source).count).to eq(2)
+    expect(path.transform(source).count).to eq(2)
   end
 
   it "forks into alternate paths" do 
@@ -91,7 +91,7 @@ describe DataPath do
       end
     end
 
-    result = path.realize(source)
+    result = path.transform(source)
 
     expect(result.count).to eq(0)
     expect(result.forks(:adults).count).to eq(2)
@@ -115,7 +115,7 @@ describe DataPath do
       end
     end
 
-    result = path.realize(source, weather: "rainy")
+    result = path.transform(source, weather: "rainy")
     result.to_a
     result.forks(:fork).to_a
   end
@@ -139,7 +139,7 @@ describe DataPath do
       end
     end
 
-    path.realize(source).to_a
+    path.transform(source).to_a
   end
 
   it "can calculate single keys" do 
@@ -163,7 +163,7 @@ describe DataPath do
       end
     end
 
-    path.realize(source)
+    path.transform(source)
   end
 
   it "can depend on other data" do 
@@ -177,7 +177,7 @@ describe DataPath do
       end
     end
 
-    result = path.realize(source)
+    result = path.transform(source)
 
     result.each do |data|
       expect(data).to have_key(:gender_name)
@@ -188,7 +188,7 @@ describe DataPath do
     end
   end
 
-  it "injects dependencies when the path is realized" do 
+  it "injects dependencies when the path is transformd" do 
     rspec = self
 
     path = DataPath::Path.new do 
@@ -201,9 +201,9 @@ describe DataPath do
       end
     end
 
-    path.realize(source, weather: "rainy").to_a
+    path.transform(source, weather: "rainy").to_a
 
-    expect { path.realize(source).to_a }.to raise_error(ArgumentError)
+    expect { path.transform(source).to_a }.to raise_error(ArgumentError)
   end
 
   it "can load data to a destination" do 
@@ -227,7 +227,7 @@ describe DataPath do
     end
 
     SumReduction.new(:age).tap do |sum|
-     result = path.realize(source)
+     result = path.transform(source)
      result.load_into(sum)
 
      expect(sum.sum).to eq(68)
@@ -245,6 +245,6 @@ describe DataPath do
       end
     end
 
-    expect(path.realize(source).count).to eq(9)
+    expect(path.transform(source).count).to eq(9)
   end
 end

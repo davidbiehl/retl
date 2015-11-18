@@ -1,5 +1,5 @@
 require "data_path/path_builder"
-require "data_path/realization"
+require "data_path/transformation"
 require "data_path/context"
 require "data_path/step_handler"
 require "data_path/explode_handler"
@@ -16,7 +16,7 @@ module DataPath
   #
   # A Path can act on a single piece of data with the {#call} method.
   #
-  # A Path can transform a list of data with the {#realize} method.
+  # A Path can transform a list of data with the {#transform} method.
   #
   # @example
   #   path = DataPath::Path.new do 
@@ -34,7 +34,7 @@ module DataPath
   #     end
   #   end
   #
-  #   path.realize(data)
+  #   path.transform(data)
   #
   class Path
     attr_reader :steps, :source, :dependencies
@@ -163,9 +163,9 @@ module DataPath
     # @param [#each] the data that will be processed by the Path
     # @option options that will be passed to #depends_on for the context
     #
-    # @return [Realization] the realization of the Path with the data
-    def realize(enumerable, options={})
-      Realization.new(enumerable, self, options)
+    # @return [Transformation] the Tranformation of the data by the Path
+    def transform(enumerable, options={})
+      Transformation.new(enumerable, self, options)
     end
   end
 end
