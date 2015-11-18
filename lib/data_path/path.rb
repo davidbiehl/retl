@@ -46,8 +46,12 @@ module DataPath
       @steps        = []
       @forks        = {}
       @dependencies = {}
-      
-      add_step parent.dup, handler: ExplodeHandler if parent
+
+      if parent
+        @dependencies = parent.dependencies.dup
+        add_step parent.dup, handler: ExplodeHandler
+      end
+
       build(&block) if block
     end
 

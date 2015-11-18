@@ -96,6 +96,28 @@ describe DataPath do
     expect(path.realize(source).count).to eq(0)
   end
 
+  it "forks have the context of the parent" do 
+    rspec = self
+
+    path = DataPath::Path.new do 
+      depends_on(:weather) { |opts| opts[:weather] }
+
+      inspect do |data|
+        rspec.expect(weather).to rspec.eq("rainy")
+      end
+
+      fork :fork do 
+        inspect do |data|
+          rspec.expect(weather).to rspec.eq("rainy")
+        end
+      end
+    end
+
+    path.forks[:fork].realize(source, weather: "rainy").to_a
+  end
+
+
+
   it "can inspect data without changing it" do
     rspec = self
     path = DataPath::Path.new do 

@@ -12,7 +12,7 @@ module DataPath
       if step.is_a?(Proc)
         instance_exec(data, self, &step)
       else
-        if step.method(:call).arity == 2
+        if step.method(:call).arity.abs == 2
           step.call(data, self)
         else
           step.call(data)
