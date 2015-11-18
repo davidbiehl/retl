@@ -91,9 +91,11 @@ describe DataPath do
       end
     end
 
-    expect(path.forks[:adults].realize(source).count).to eq(2)
-    expect(path.forks[:children].realize(source).count).to eq(1)
-    expect(path.realize(source).count).to eq(0)
+    result = path.realize(source)
+
+    expect(result.count).to eq(0)
+    expect(result.forks(:adults).count).to eq(2)
+    expect(result.forks(:children).count).to eq(1)
   end
 
   it "forks have the context of the parent" do 
@@ -113,7 +115,9 @@ describe DataPath do
       end
     end
 
-    path.forks[:fork].realize(source, weather: "rainy").to_a
+    result = path.realize(source, weather: "rainy")
+    result.to_a
+    result.forks(:fork).to_a
   end
 
 

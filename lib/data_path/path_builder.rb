@@ -29,7 +29,7 @@ module DataPath
     alias_method :select, :filter
 
     def fork(name, &block)
-      @path.add_fork(name, &block)
+      @path.add_fork_builder(name, &block)
     end
 
     def inspect(action=nil, &block)

@@ -17,6 +17,10 @@ module DataPath
       end
     end
 
+    def forks(name)
+      @path.forks(name).realize(@enumerable, @options)
+    end
+
     def load_into(*destinations)
       destinations = Array(destinations)
 

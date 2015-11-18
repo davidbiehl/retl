@@ -37,15 +37,16 @@ module DataPath
   #   path.realize(data)
   #
   class Path
-    attr_reader :steps, :source, :dependencies, :forks
+    attr_reader :steps, :source, :dependencies
 
     # Initializes a new Path
     #
     # @param parent [Path] - a Path to inherit from
     def initialize(parent=nil, &block)
-      @steps        = []
-      @forks        = {}
-      @dependencies = {}
+      @steps         = []
+      @dependencies  = {}
+      @forks         = {}
+      @fork_builders = {}
 
       if parent
         @dependencies = parent.dependencies.dup
@@ -68,8 +69,9 @@ module DataPath
     # as well. That was if additional steps are added to the original Path
     # they won't be part of the copied Path.
     def initialize_copy(source)
-      @steps = source.steps.dup
-      @forks = {}
+      @steps         = source.steps.dup
+      @forks         = {}
+      @fork_builders = {}
     end
 
     # Adds a step to the Path
@@ -115,7 +117,7 @@ module DataPath
     #   path.add_fork(:river) do 
     #     filter { |data| data[:is_wet] }
     #   end
-    #   path.forks[:river]
+    #   path.forks(:river)
     #
     # @param name [Symbol] the name of the fork
     #
@@ -123,6 +125,26 @@ module DataPath
     def add_fork(name, &block)
       fork = Path.new(self, &block)
       @forks[name] = fork 
+    end
+
+    # Gets a fork by name
+    #
+    # @param name [Symbol] the name of the fork to get
+    #
+    # @return [Path] the forked path
+    def forks(name)
+      @forks[name]
+    end
+
+    # Adds a fork builder block
+    #
+    # @param name   [Symbol] the name of the fork to build
+    # @param &block [Block]  the block that builds the fork
+    #
+    # @return [Fork] the built fork
+    def add_fork_builder(name, &block)
+      @fork_builders[name] = block
+      add_fork(name, &block)
     end
 
     # Adds a depdency to the Path
