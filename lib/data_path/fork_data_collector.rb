@@ -10,8 +10,8 @@ module DataPath
       end
     end
 
-    def fork_data(name)
-      @fork_data[name]
+    def take(name)
+      @fork_data.delete(name)
     end
   end
 end

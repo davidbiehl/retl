@@ -29,7 +29,7 @@ module DataPath
 
     def forks(name)
       build_result
-      @path.forks(name).transform(@fork_data.fork_data(name), @options)
+      @path.forks(name).transform(@fork_data.take(name), @options)
     end
 
     def load_into(*destinations)
