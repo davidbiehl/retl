@@ -1,11 +1,13 @@
+require "data_path/event_router"
+
 module DataPath
   class Context
     def initialize(path, options={})
-      @path  = path
-
-      @path.dependencies.each do |name, dependency|
+      path.dependencies.each do |name, dependency|
         self.class.send(:define_method, name) { dependency.call(options) }
       end
+
+      @_events = EventRouter.new
     end
 
     def execute_step(step, data)
@@ -18,6 +20,10 @@ module DataPath
           step.call(data)
         end
       end
+    end
+
+    def _events
+      @_events
     end
   end
 end

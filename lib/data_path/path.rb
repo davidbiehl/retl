@@ -3,6 +3,7 @@ require "data_path/transformation"
 require "data_path/context"
 require "data_path/step_handler"
 require "data_path/explode_handler"
+require "data_path/fork_handler"
 
 module DataPath
   # A Path is a blueprint for transforming data
@@ -85,7 +86,11 @@ module DataPath
     #
     # @return [void]
     def add_step(step, handler: StepHandler)
-      @steps << handler.new(step)
+      add_handler handler.new(step)
+    end
+
+    def add_handler(handler)
+      @steps << handler
     end
 
     # Execuutes the Path with the given data
@@ -123,7 +128,8 @@ module DataPath
     #
     # @return [void]
     def add_fork(name, &block)
-      fork = Path.new(self, &block)
+      fork = Path.new(&block)
+      add_handler ForkHandler.new(name)
       @forks[name] = fork 
     end
 

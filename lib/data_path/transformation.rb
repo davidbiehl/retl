@@ -1,4 +1,5 @@
 require "data_path/context"
+require "data_path/fork_data_collector"
 
 module DataPath
   class Transformation
@@ -6,19 +7,21 @@ module DataPath
     
     def initialize(enumerable, path, options={})
       @enumerable, @path, @options = enumerable, path, options
+      @context   = Context.new(@path, @options)
+      @fork_data = ForkDataCollector.new(@context)
     end
 
     def each(&block)
-      context = Context.new(@path, @options)
-      @enumerable.each do |data|
-        @path.call(data, context).each do |data|
-          yield data
-        end
+      if @result
+        @result.each(&block)
+      else
+        build_result(&block)
       end
     end
 
     def forks(name)
-      @path.forks(name).transform(@enumerable, @options)
+      build_result
+      @path.forks(name).transform(@fork_data.fork_data(name), @options)
     end
 
     def load_into(*destinations)
@@ -32,6 +35,17 @@ module DataPath
 
       destinations.each do |destination|
         destination.close if destination.respond_to?(:close)
+      end
+    end
+
+    def build_result(&block)
+      @result ||= [].tap do |result| 
+        @enumerable.each do |data|
+          @path.call(data, @context).each do |data|
+            result << data
+            yield data if block_given?
+          end
+        end
       end
     end
   end
