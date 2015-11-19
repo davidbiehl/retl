@@ -166,7 +166,7 @@ module DataPath
 
     # Executes the Path with data
     #
-    # @param [#each] the data that will be processed by the Path
+    # @param [Enumerable] the data that will be processed by the Path
     # @option options that will be passed to #depends_on for the context
     #
     # @return [Transformation] the Tranformation of the data by the Path

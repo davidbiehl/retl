@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 class SampleData
+  include Enumerable
+
   def each
     yield({age: 33, name: "David", gender: "M"})
     yield({age: 35, name: "Elizabeth", gender: "F"})
@@ -120,7 +122,18 @@ describe DataPath do
     result.forks(:fork).to_a
   end
 
+  it "forks still work with each_slice" do 
+    path = DataPath::Path.new do 
+      fork :fork do 
+      end
+    end
 
+    count = path.transform(source).each_slice(2).reduce(0) do |sum, slice|
+      sum + slice.forks(:fork).count
+    end
+
+    expect(count).to eq(3)
+  end
 
   it "can inspect data without changing it" do
     rspec = self
