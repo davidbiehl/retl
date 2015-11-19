@@ -33,7 +33,7 @@ describe DataPath do
 
   it "replaces data" do 
     path = DataPath::Path.new do 
-      step do |data|
+      replace do |data|
         data[:age]
       end
     end

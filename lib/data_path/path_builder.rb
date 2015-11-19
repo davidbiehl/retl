@@ -16,6 +16,7 @@ module DataPath
       step ||= block
       @path.add_step step, handler: handler
     end
+    alias_method :replace, :step
 
     def transform(action=nil, &block)
       action ||= block
