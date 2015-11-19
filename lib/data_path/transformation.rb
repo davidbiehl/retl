@@ -12,23 +12,24 @@ module DataPath
     end
 
     def each(&block)
-      if @result
-        @result.each(&block)
+      if @each
+        @each.each(&block)
       else
-        build_result(&block)
+        build_each_result(&block)
       end
     end
 
     def each_slice(size, &block)
-      @slices ||= @enumerable.each_slice(size).reduce([]) do |result, slice|
-        transformed_slice = Transformation.new(slice, @path, @options)
-        yield transformed_slice if block_given?
-        result << transformed_slice
+      @each_slice ||= {}
+      if @each_slice[size]
+        @each_slice[size].each(&block)
+      else
+        build_each_slice_result(size, &block)
       end
     end
 
     def forks(name)
-      build_result
+      build_each_result
       @path.forks(name).transform(@fork_data.take(name), @options)
     end
 
@@ -46,12 +47,20 @@ module DataPath
       end
     end
 
-    def build_result(&block)
-      @result ||= @enumerable.reduce([]) do |result, data|
+    def build_each_result(&block)
+      @each ||= @enumerable.reduce([]) do |result, data|
         @path.call(data, @context).each do |data|
           yield data if block_given?
           result << data
         end
+      end
+    end
+
+    def build_each_slice_result(size, &block)
+      @each_slice[size] ||= @enumerable.each_slice(size).reduce([]) do |result, slice|
+        transformed_slice = Transformation.new(slice, @path, @options)
+        yield transformed_slice if block_given?
+        result << transformed_slice
       end
     end
   end
