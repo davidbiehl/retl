@@ -1,9 +1,9 @@
-require "data_path/step_handler"
+require_relative "handler"
 
 module DataPath
-  class ForkHandler < StepHandler
+  class ForkHandler < Handler
     def initialize(fork)
-      super(nil)
+      super()
       @fork = fork
     end
 

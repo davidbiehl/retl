@@ -1,18 +1,15 @@
 module DataPath
-  class StepHandler
-    attr_reader :step
-
-    def initialize(step)
-      @step   = step
+  class Handler
+    def initialize
       @output = []
-    end
-
-    def push_in(data, context)
-      push_out context.execute_step(step, data)
     end
 
     def output
       @output.slice!(0, @output.count)
+    end
+
+    def push_in(data, context)
+      raise NotImplementedError, "Handlers much implement the #push_in(data, context) method"
     end
 
     private

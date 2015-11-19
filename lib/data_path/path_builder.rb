@@ -1,8 +1,8 @@
-require "data_path/step_handler"
-require "data_path/transform_handler"
-require "data_path/filter_handler"
-require "data_path/inspect_handler"
-require "data_path/explode_handler"
+require "data_path/handlers/step_handler"
+require "data_path/handlers/transform_handler"
+require "data_path/handlers/filter_handler"
+require "data_path/handlers/inspect_handler"
+require "data_path/handlers/explode_handler"
 
 
 module DataPath

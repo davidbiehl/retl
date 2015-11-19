@@ -1,9 +1,10 @@
 require "data_path/path_builder"
 require "data_path/transformation"
 require "data_path/context"
-require "data_path/step_handler"
-require "data_path/explode_handler"
-require "data_path/fork_handler"
+require "data_path/handlers/handler"
+require "data_path/handlers/step_handler"
+require "data_path/handlers/explode_handler"
+require "data_path/handlers/fork_handler"
 
 module DataPath
   # A Path is a blueprint for transforming data

@@ -1,4 +1,4 @@
-require "data_path/step_handler"
+require_relative "step_handler"
 
 module DataPath
   class InspectHandler < StepHandler

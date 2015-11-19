@@ -47,6 +47,8 @@ module DataPath
       end
     end
 
+    private
+
     def build_each_result(&block)
       @each ||= @enumerable.reduce([]) do |result, data|
         @path.call(data, @context).each do |data|
