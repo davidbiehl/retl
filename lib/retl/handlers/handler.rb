@@ -1,4 +1,4 @@
-module DataPath
+module Retl
   class Handler
     def initialize
       @output = []

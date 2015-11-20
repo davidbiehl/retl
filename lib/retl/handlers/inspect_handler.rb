@@ -1,9 +1,9 @@
 require_relative "step_handler"
 
-module DataPath
-  class TransformHandler < StepHandler
+module Retl
+  class InspectHandler < StepHandler
     def push_in(data, context)
-      context.execute_step(step, data)
+      context.execute_step(step, data.dup)
       push_out data
     end
   end

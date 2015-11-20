@@ -1,10 +1,10 @@
 require "spec_helper"
 require_relative "handlers_context"
 
-describe DataPath::ExplodeHandler do 
+describe Retl::ExplodeHandler do 
   include_context :handlers
 
-  subject { DataPath::ExplodeHandler.new(step) }
+  subject { Retl::ExplodeHandler.new(step) }
   let(:step) { Proc.new { |data, context| data.times.map { |x| x + x } } }
   let(:data) { 3 }
 

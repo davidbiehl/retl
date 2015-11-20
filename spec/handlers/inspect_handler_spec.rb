@@ -1,10 +1,10 @@
 require "spec_helper"
 require_relative "handlers_context"
 
-describe DataPath::InspectHandler do 
+describe Retl::InspectHandler do 
   include_context :handlers
 
-  subject { DataPath::InspectHandler.new(step) }
+  subject { Retl::InspectHandler.new(step) }
   let(:step) { Proc.new { |data, context| data[:meniacal_laughter] = "hahaha!"} }
 
   it "doesn't change the data" do 

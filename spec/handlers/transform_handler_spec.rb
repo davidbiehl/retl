@@ -1,10 +1,10 @@
 require "spec_helper"
 require_relative "handlers_context"
 
-describe DataPath::TransformHandler do 
+describe Retl::TransformHandler do 
   include_context :handlers
 
-  subject { DataPath::TransformHandler.new(step) }
+  subject { Retl::TransformHandler.new(step) }
   let(:step) { Proc.new { |data, context| data[:meniacal_laughter] = "hahaha!"} }
 
   it "changes the source data" do 

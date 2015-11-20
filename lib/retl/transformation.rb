@@ -1,7 +1,7 @@
-require "data_path/context"
-require "data_path/fork_data_collector"
+require "retl/context"
+require "retl/fork_data_collector"
 
-module DataPath
+module Retl
   class Transformation
     include Enumerable
     

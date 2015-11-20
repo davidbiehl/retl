@@ -1,10 +1,10 @@
 require "spec_helper"
 require_relative "handlers_context"
 
-describe DataPath::FilterHandler do 
+describe Retl::FilterHandler do 
   include_context :handlers
 
-  subject { DataPath::FilterHandler.new(step) }
+  subject { Retl::FilterHandler.new(step) }
   let(:step) { Proc.new { |data, context| data[:name] == "David"} }
 
   it "pushes out data that matches the filter" do 

@@ -1,6 +1,6 @@
 require_relative "step_handler"
 
-module DataPath
+module Retl
   class FilterHandler < StepHandler
     def push_in(data, context)
       keep = context.execute_step(step, data)

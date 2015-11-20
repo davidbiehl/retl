@@ -1,17 +1,17 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'data_path/version'
+require 'retl/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "data_path"
-  spec.version       = DataPath::VERSION
+  spec.name          = "retl"
+  spec.version       = Retl::VERSION
   spec.authors       = ["David Biehl"]
   spec.email         = ["me@davidbiehl.com"]
 
   spec.summary       = %q{Path based ETL processing in Ruby}
   spec.description   = %q{Define paths for your data for ETL processing}
-  spec.homepage      = "https://github.com/davidbiehl/data_path.git"
+  spec.homepage      = "https://github.com/davidbiehl/retl.git"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }

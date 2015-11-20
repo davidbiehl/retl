@@ -1,9 +1,9 @@
 require "spec_helper"
 require_relative "handlers_context"
 
-describe DataPath::StepHandler do 
+describe Retl::StepHandler do 
   include_context :handlers
-  subject { DataPath::StepHandler.new(step) }
+  subject { Retl::StepHandler.new(step) }
   let(:step) { Proc.new { |data, context| 5 } }
 
   it "replaces data" do 

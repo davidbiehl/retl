@@ -1,6 +1,6 @@
 require_relative "handler"
 
-module DataPath
+module Retl
   class ForkHandler < Handler
     def initialize(fork)
       super()

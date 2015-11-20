@@ -1,6 +1,6 @@
-require "data_path/event_router"
+require "retl/event_router"
 
-module DataPath
+module Retl
   class Context
     def initialize(path, options={})
       path.dependencies.each do |name, dependency|

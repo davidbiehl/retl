@@ -1,6 +1,6 @@
 require_relative "step_handler"
 
-module DataPath
+module Retl
   class ExplodeHandler < StepHandler
     def push_in(data, context)
       context.execute_step(step, data).each do |result|

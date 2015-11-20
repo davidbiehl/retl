@@ -1,12 +1,12 @@
-require "data_path/path_builder"
-require "data_path/transformation"
-require "data_path/context"
-require "data_path/handlers/handler"
-require "data_path/handlers/step_handler"
-require "data_path/handlers/explode_handler"
-require "data_path/handlers/fork_handler"
+require "retl/path_builder"
+require "retl/transformation"
+require "retl/context"
+require "retl/handlers/handler"
+require "retl/handlers/step_handler"
+require "retl/handlers/explode_handler"
+require "retl/handlers/fork_handler"
 
-module DataPath
+module Retl
   # A Path is a blueprint for transforming data
   #
   # A Path is a sequence of steps that are executed on data in order to 
@@ -21,7 +21,7 @@ module DataPath
   # A Path can transform a list of data with the {#transform} method.
   #
   # @example
-  #   path = DataPath::Path.new do 
+  #   path = Retl::Path.new do 
   #     step do |data|
   #       data[:something] = "some value"
   #       data

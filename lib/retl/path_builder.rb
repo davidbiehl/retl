@@ -1,11 +1,11 @@
-require "data_path/handlers/step_handler"
-require "data_path/handlers/transform_handler"
-require "data_path/handlers/filter_handler"
-require "data_path/handlers/inspect_handler"
-require "data_path/handlers/explode_handler"
+require "retl/handlers/step_handler"
+require "retl/handlers/transform_handler"
+require "retl/handlers/filter_handler"
+require "retl/handlers/inspect_handler"
+require "retl/handlers/explode_handler"
 
 
-module DataPath
+module Retl
   class PathBuilder
     def initialize(path, &block)
       @path = path

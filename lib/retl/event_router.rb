@@ -1,4 +1,4 @@
-module DataPath
+module Retl
   class EventRouter
     def initialize
       @listeners = {}

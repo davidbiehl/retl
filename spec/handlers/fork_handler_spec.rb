@@ -1,10 +1,10 @@
 require "spec_helper"
 require_relative "handlers_context"
 
-describe DataPath::ForkHandler do 
+describe Retl::ForkHandler do 
   include_context :handlers
 
-  subject { DataPath::ForkHandler.new(:my_fork) }
+  subject { Retl::ForkHandler.new(:my_fork) }
 
   it "triggers a fork_data event on the context" do 
     context._events.listen_to(:fork_data) do |args|

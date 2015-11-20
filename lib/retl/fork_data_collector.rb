@@ -1,4 +1,4 @@
-module DataPath
+module Retl
   class ForkDataCollector
     def initialize(context)
       @fork_data = {}

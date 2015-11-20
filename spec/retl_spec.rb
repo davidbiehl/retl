@@ -16,15 +16,15 @@ class TypeTransformation
   end
 end
 
-describe DataPath do
+describe Retl do
   let(:source) { SampleData.new }
 
   it 'has a version number' do
-    expect(DataPath::VERSION).not_to be nil
+    expect(Retl::VERSION).not_to be nil
   end
 
   it "transforms data" do 
-    path = DataPath::Path.new do 
+    path = Retl::Path.new do 
       transform TypeTransformation
     end
 
@@ -34,7 +34,7 @@ describe DataPath do
   end
 
   it "replaces data" do 
-    path = DataPath::Path.new do 
+    path = Retl::Path.new do 
       replace do |data|
         data[:age]
       end
@@ -44,7 +44,7 @@ describe DataPath do
   end
 
   it "filters data" do 
-    path = DataPath::Path.new do 
+    path = Retl::Path.new do 
       transform TypeTransformation
 
       filter do |data|
@@ -61,7 +61,7 @@ describe DataPath do
   end
 
   it "rejects data" do 
-    path = DataPath::Path.new do 
+    path = Retl::Path.new do 
       transform TypeTransformation
 
       reject do |data|
@@ -73,7 +73,7 @@ describe DataPath do
   end
 
   it "forks into alternate paths" do 
-    path = DataPath::Path.new do 
+    path = Retl::Path.new do 
       transform TypeTransformation
 
       fork :adults do 
@@ -103,7 +103,7 @@ describe DataPath do
   it "forks have the context of the parent" do 
     rspec = self
 
-    path = DataPath::Path.new do 
+    path = Retl::Path.new do 
       depends_on(:weather) { |opts| opts[:weather] }
 
       inspect do |data|
@@ -123,7 +123,7 @@ describe DataPath do
   end
 
   it "forks still work with each_slice" do 
-    path = DataPath::Path.new do 
+    path = Retl::Path.new do 
       fork :fork do 
       end
     end
@@ -137,7 +137,7 @@ describe DataPath do
 
   it "can inspect data without changing it" do
     rspec = self
-    path = DataPath::Path.new do 
+    path = Retl::Path.new do 
       inspect do |data|
         data[:other] = "awesome"
         rspec.expect(data).to_not rspec.have_key(:type)
@@ -158,7 +158,7 @@ describe DataPath do
   it "can calculate single keys" do 
     rspec = self
 
-    path = DataPath::Path.new do 
+    path = Retl::Path.new do 
       calculate(:upper_name) do |data|
         data[:name].upcase
       end
@@ -180,7 +180,7 @@ describe DataPath do
   end
 
   it "can depend on other data" do 
-    path = DataPath::Path.new do 
+    path = Retl::Path.new do 
       depends_on(:gender_names) do 
         {"M" => "Male", "F" => "Female"}
       end
@@ -204,7 +204,7 @@ describe DataPath do
   it "injects dependencies when the path is transformd" do 
     rspec = self
 
-    path = DataPath::Path.new do 
+    path = Retl::Path.new do 
       depends_on(:weather) do |options|
         options[:weather] || (raise ArgumentError, "This path depends on the weather")
       end
@@ -234,7 +234,7 @@ describe DataPath do
       end
     end
 
-    path = DataPath::Path.new do 
+    path = Retl::Path.new do 
       transform TypeTransformation
       filter { |data| data[:type] == "adult" }
     end
@@ -248,7 +248,7 @@ describe DataPath do
   end
 
   it "can explode data" do 
-    path = DataPath::Path.new do 
+    path = Retl::Path.new do 
       transform TypeTransformation
       explode do |data|
         3.times.map do |i|

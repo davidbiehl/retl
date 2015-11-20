@@ -1,3 +1,3 @@
-module DataPath
+module Retl
   VERSION = "0.1.0"
 end

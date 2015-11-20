@@ -1,6 +1,6 @@
 require_relative "handler"
 
-module DataPath
+module Retl
   class StepHandler < Handler
     attr_reader :step
 
