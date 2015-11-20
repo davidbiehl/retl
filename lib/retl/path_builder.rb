@@ -3,6 +3,7 @@ require "retl/handlers/transform_handler"
 require "retl/handlers/filter_handler"
 require "retl/handlers/inspect_handler"
 require "retl/handlers/explode_handler"
+require "retl/handlers/path_handler"
 
 
 module Retl
@@ -57,6 +58,10 @@ module Retl
     def explode(action=nil, &block)
       action ||= block
       step(action, handler: ExplodeHandler)
+    end
+
+    def path(path, dependencies={}, &block)
+      @path.add_handler PathHandler.new(path, dependencies, &block)
     end
   end
 end

@@ -1,15 +1,5 @@
 require 'spec_helper'
 
-class SampleData
-  include Enumerable
-
-  def each
-    yield({age: 33, name: "David", gender: "M"})
-    yield({age: 35, name: "Elizabeth", gender: "F"})
-    yield({age: 5 , name: "Pake", gender: "M"})
-  end
-end
-
 class TypeTransformation
   def self.call(data)
     data[:type] = data[:age] >= 18 ? "adult" : "child"
@@ -17,7 +7,7 @@ class TypeTransformation
 end
 
 describe Retl do
-  let(:source) { SampleData.new }
+  include_context "sample source"
 
   it 'has a version number' do
     expect(Retl::VERSION).not_to be nil
