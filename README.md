@@ -224,10 +224,10 @@ my_path.transform(6).to_a
 
 #### Path Reuse
 
-In rETL, Paths can be re-used with the `step` step. Common Paths can be defined
-to ensure that calculations yield consistent results throughout the entire ETL
-project. Consistent data and meanings will make the data warehouse easier to
-understand for data consumers.
+In rETL, Paths can be re-used with the `explode` step. Common Paths can be
+defined to ensure that calculations yield consistent results throughout the
+entire ETL project. Consistent data and meanings will make the data warehouse
+easier to understand for data consumers.
 
 ```
 AdultOrChild = Retl::Path.new do 
@@ -237,7 +237,7 @@ AdultOrChild = Retl::Path.new do
 end
 
 my_path = Retl::Path.new do 
-  step AdultOrChild
+  explode AdultOrChild
 
   ### perform other steps
 end
