@@ -222,28 +222,7 @@ my_path.transform(6).to_a
 #=> [3, 9, 15]
 ```
 
-#### Path Reuse
-
-In rETL, Paths can be re-used with the `explode` step. Common Paths can be
-defined to ensure that calculations yield consistent results throughout the
-entire ETL project. Consistent data and meanings will make the data warehouse
-easier to understand for data consumers.
-
-```
-AdultOrChild = Retl::Path.new do 
-  calculate(:adult_or_child) do 
-    row[:age] >= 18 ? "adult" : "child"
-  end
-end
-
-my_path = Retl::Path.new do 
-  explode AdultOrChild
-
-  ### perform other steps
-end
-```
-
-### Dependencies
+#### Dependencies
 
 Dependencies can be defined with the `depends_on(name)`. The value of the
 dependency is accessible inside of each step by its name. In this example, we'll
@@ -291,6 +270,68 @@ age_lookup_hash = {
 
 my_path.transform(data, age_lookup: age_lookup_hash)
 ```
+
+#### Path Reuse
+
+In rETL, paths can be re-used with the `path` step. Common Paths can be
+defined to ensure that calculations yield consistent results throughout the
+entire ETL project. Consistent data and meanings will make the data warehouse
+easier to understand for data consumers.
+
+```
+AdultOrChild = Retl::Path.new do 
+  calculate(:adult_or_child) do 
+    row[:age] >= 18 ? "adult" : "child"
+  end
+end
+
+my_path = Retl::Path.new do 
+  path AdultOrChild
+
+  ### perform other steps
+end
+```
+
+##### Path Reuse with Dependencies
+
+The `AdultOrChild` path above isn't very flexible. It depends on an `:age` key
+to be present in the hash. What if our data uses a different key, like
+`:years_since_birth`? rETL can make this more flexible by adding dependencies.
+
+```
+FlexibleAdultOrChild = Retl::Path.new do 
+  depends_on(:from) do |options|
+    options[:from] || (raise ArgumentError, "FlexibleAdultOrChild depends on :from")
+  end
+
+  depends_on(:to) do |options|
+    options[:to] || :adult_or_child   # use a default value
+  end
+
+  transform do |row|
+    row[to] = row[from] >= 18 ? "adult" : "child"
+  end
+end
+
+
+path_with_age = Retl::Path.new do 
+  path FlexibleAdultOrChild, from: :age
+end
+
+path_with_age.transform([{age: 33}]).to_a
+#=> [{age: 33, adult_or_child: "adult"}]
+
+
+path_with_years_since_birth = Retl::Path.new do 
+  path FlexibleAdultOrChild do
+    { from: :years_since_birth, to: :age_classification }   # blocks work too
+  end
+end
+
+path_with_years_since_birth.transform([{years_since_birth: 7}]).to_a
+#=> [{years_since_birth: 7, age_classification: "child"}]
+```
+
 
 ## Roadmap
 
