@@ -9,6 +9,7 @@ module Retl
       @enumerable, @path, @options = enumerable, path, options
       @context   = Context.new(@path, @options)
       @fork_data = ForkDataCollector.new(@context)
+      @forks     = {}
     end
 
     def each(&block)
@@ -29,8 +30,12 @@ module Retl
     end
 
     def forks(name)
-      build_each_result
-      @path.forks(name).transform(@fork_data.take(name), @options)
+      unless @forks[name]
+        build_each_result
+        @forks[name] = @path.forks(name).transform(@fork_data.take(name), @options)
+      end
+
+      @forks[name]
     end
 
     def load_into(*destinations)
