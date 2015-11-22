@@ -8,6 +8,12 @@ class SampleData
   end
 end
 
+class TypeTransformation
+  def self.call(data)
+    data[:type] = data[:age] >= 18 ? "adult" : "child"
+  end
+end
+
 shared_context "sample source" do 
   let(:source) { SampleData.new }
 end
