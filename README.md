@@ -232,8 +232,6 @@ end
 result = my_path.transform([6])
 result.to_a
 #=> [3, 9, 15]
-
-expect(result.to_a).to eq([3, 9, 15])
 ```
 
 #### Path Reuse
