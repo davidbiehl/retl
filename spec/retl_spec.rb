@@ -250,4 +250,20 @@ describe Retl do
 
     expect(path.transform(source).count).to eq(9)
   end
+
+  it "memoizes the transformation result" do 
+    path = Retl::Path.new do 
+      transform TypeTransformation
+      explode do |data|
+        3.times.map do |i|
+          data[:set] = i
+          data
+        end
+      end
+    end
+
+    result = path.transform(source)
+    result.to_a
+    expect(result.count).to eq(9)
+  end
 end

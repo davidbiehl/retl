@@ -55,6 +55,7 @@ module Retl
           yield data if block_given?
           result << data
         end
+        result
       end
     end
 
