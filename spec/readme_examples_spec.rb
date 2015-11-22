@@ -174,5 +174,126 @@ describe "Readme Examples" do
       expect(result.forks(:children).count).to eq(2)
       expect(result.count).to eq(0)
     end
+
+    it "Explode" do 
+      my_path = Retl::Path.new do
+        explode do |number|
+          number.times.map { |x| x + x + x }
+        end
+
+        filter do |number|
+          number.odd?
+        end
+      end
+
+      result = my_path.transform([6])
+      result.to_a
+      #=> [3, 9, 15]
+
+      expect(result.to_a).to eq([3, 9, 15])
+    end
+
+    AdultOrChild = Retl::Path.new do 
+      calculate(:adult_or_child) do |row|
+        row[:age] >= 18 ? "adult" : "child"
+      end
+    end
+
+    it "Path Reuse" do 
+      my_path = Retl::Path.new do 
+        path AdultOrChild
+
+        ### perform other steps
+      end
+
+      result = my_path.transform([{age: 3}])
+      result.to_a
+      #=> [ { age: 3, adult_or_child: "child" } ]
+
+      expect(result.to_a).to eq([ { age: 3, adult_or_child: "child" } ])
+    end
+
+    it "Dependencies" do 
+      my_path = Retl::Path.new do
+        depends_on(:age_lookup) do   # hint: the block returns the default value
+          { 
+            "adult" => "Adults are 18 or older",
+            "child" => "Children are younger than 18"
+          }
+        end
+
+        path AdultOrChild   # see previous example
+
+        calculate(:age_description) do |row|
+          age_lookup[row[:adult_or_child]]
+        end
+      end
+
+      result = my_path.transform([{age: 19}])
+      result.to_a
+      #=> [ { age: 19, adult_or_child: "adult", age_description: "Adults are 18 or older" } ]
+
+      expect(result.to_a).to eq([ { age: 19, adult_or_child: "adult", age_description: "Adults are 18 or older" } ])
+    end
+
+    it "Dependency Injection" do 
+      my_path = Retl::Path.new do
+        depends_on(:age_lookup)   # hint: without a block, the dependency must
+                                  # be provided when #transform is called
+        path AdultOrChild
+
+        calculate(:age_description) do |row|
+          age_lookup[row[:adult_or_child]]
+        end
+      end
+
+      age_lookup_hash = { 
+        "adult" => "Adults are 18 or older",
+        "child" => "Children are younger than 18"
+      }
+
+      result = my_path.transform([{age: 4}], age_lookup: age_lookup_hash)
+      result.to_a
+      #=> [ { age: 4, adult_or_child: "child", age_description: "Children are younger than 18" } ]
+
+      expect(result.to_a).to eq([ { age: 4, adult_or_child: "child", age_description: "Children are younger than 18" } ])
+    end
+
+    it "Path Reuse with Dependencies" do 
+      FlexibleAdultOrChild = Retl::Path.new do 
+        depends_on(:from) 
+
+        depends_on(:to) do |options|
+          options[:to] || :adult_or_child   # use a default value
+        end
+
+        transform do |row|
+          row[to] = row[from] >= 18 ? "adult" : "child"
+        end
+      end
+
+
+      path_with_age = Retl::Path.new do 
+        path FlexibleAdultOrChild, from: :age
+      end
+
+      path_with_age_result = path_with_age.transform([{age: 33}])
+      path_with_age_result.to_a
+      #=> [{age: 33, adult_or_child: "adult"}]
+
+
+      path_with_years_since_birth = Retl::Path.new do 
+        path FlexibleAdultOrChild do
+          { from: :years_since_birth, to: :age_classification }   # blocks work too
+        end
+      end
+
+      result = path_with_years_since_birth.transform([{years_since_birth: 7}])
+      result.to_a
+      #=> [{years_since_birth: 7, age_classification: "child"}]
+
+      expect(path_with_age_result.to_a).to eq([{age: 33, adult_or_child: "adult"}])
+      expect(result.to_a).to eq([{years_since_birth: 7, age_classification: "child"}])
+    end
   end
 end

@@ -44,8 +44,8 @@ returned, which is `Enumerable`.
 
 ```
 data = [
-  { full_name: "David"  , last_name: "Biehl" },
-  { full_name: "Indiana", last_name: "Jones" }
+  { first_name: "David"  , last_name: "Biehl" },
+  { first_name: "Indiana", last_name: "Jones" }
 ]
 
 result = my_path.transform(data)
@@ -70,15 +70,25 @@ common use is to use `replace` as the first step to convert incoming objects
 into hashes.
 
 ```
-users = Users.where(active: true)  # a bunch of ActiveRecord objects
+users = [
+  ["David", "Biehl", 33],
+  ["Indiana", "Jones", 50]
+]
 
 my_path = Retl::Path.new do
-  replace do |user|
-    user.to_hash
+  replace do |row|
+    { first_name: row[0], last_name: row[1], age: row[2] }
   end
 
   # perform other steps with the hash
 end
+
+result = my_path.transform(users)
+result.to_a
+#=> [
+#=>   {:first_name=>"David", :last_name=>"Biehl", :age=>33}, 
+#=>   {:first_name=>"Indiana", :last_name=>"Jones", :age=>50}
+#=> ]
 ```
 
 #### Filter & Reject
@@ -89,9 +99,9 @@ truthy. `select` is an alias for `filter`.
 
 ```
 data = [
-  {name: "David"  , age: 33}
-  {name: "Indiana", age: 50}
-  {name: "Sully"  , age: 7}
+  {name: "David"  , age: 33},
+  {name: "Indiana", age: 50},
+  {name: "Sully"  , age: 7},
   {name: "Boo"    , age: 3}
 ]
 
@@ -111,7 +121,8 @@ end
 
 result = my_path.transform(data)
 result.to_a
-#=> [ { name: "David", ... } ]
+#=> [{:name=>"David", :age=>33, :adult_or_child=>"adult"}]
+
 ```
 
 #### Calculate
@@ -162,9 +173,9 @@ are unaffected by any steps that take place after the fork is defined.
 
 ```
 data = [
-  { name: "David"  , age: 33 }
-  { name: "Indiana", age: 50 }
-  { name: "Sully"  , age: 7 }
+  { name: "David"  , age: 33 },
+  { name: "Indiana", age: 50 },
+  { name: "Sully"  , age: 7 },
   { name: "Boo"    , age: 3 }
 ]
 
@@ -208,7 +219,7 @@ The `explode` step adds additional data to the Path. The return value of the
 block should respond to `#each`, like an Array.
 
 ```
-my_path = Reth::Path.new do
+my_path = Retl::Path.new do
   explode do |number|
     number.times.map { |x| x + x + x }
   end
@@ -218,57 +229,11 @@ my_path = Reth::Path.new do
   end
 end
 
-my_path.transform(6).to_a
+result = my_path.transform([6])
+result.to_a
 #=> [3, 9, 15]
-```
 
-#### Dependencies
-
-Dependencies can be defined with the `depends_on(name)`. The value of the
-dependency is accessible inside of each step by its name. In this example, we'll
-define an `age_lookup` dependency.
-
-```
-my_path = Retl::Path.new do
-  depends_on(:age_lookup) do 
-    { 
-      "adult" => "Adults are 18 or older",
-      "child" => "Children are younger than 18"
-    }
-  end
-
-  step AdultOrChild   # see previous example
-
-  calculate(:age_description) do |row|
-    age_lookup[row[:adult_or_child]]
-  end
-end
-```
-
-Dependencies can also be injected when the transformation takes place. This is
-useful for testing by passing in mocks or stubs. Also, concrete results from
-other paths can be merged merged into a single path making data integration
-possible.
-
-```
-my_path = Retl::Path.new do
-  depends_on(:age_lookup) do |options|  # transformation options are passed into `depends_on`
-    options[:age_lookup] || (raise ArgumentError, "This Path depends on an age lookup hash")
-  end
-
-  step AdultOrChild
-
-  calculate(:age_description) do |row|
-    age_lookup[row[:adult_or_child]]
-  end
-end
-
-age_lookup_hash = { 
-  "adult" => "Adults are 18 or older",
-  "child" => "Children are younger than 18"
-}
-
-my_path.transform(data, age_lookup: age_lookup_hash)
+expect(result.to_a).to eq([3, 9, 15])
 ```
 
 #### Path Reuse
@@ -280,7 +245,7 @@ easier to understand for data consumers.
 
 ```
 AdultOrChild = Retl::Path.new do 
-  calculate(:adult_or_child) do 
+  calculate(:adult_or_child) do |row|
     row[:age] >= 18 ? "adult" : "child"
   end
 end
@@ -288,11 +253,69 @@ end
 my_path = Retl::Path.new do 
   path AdultOrChild
 
-  ### perform other steps
+  ### perform other steps, if necessary
 end
+
+result = my_path.transform([{age: 3}])
+result.to_a
+#=> [ { age: 3, adult_or_child: "child" } ]
 ```
 
-##### Path Reuse with Dependencies
+#### Dependencies
+
+Dependencies can be defined with the `depends_on(name)`. The value of the
+dependency is accessible inside of each step by its name. In this example, we'll
+define an `age_lookup` dependency.
+
+```
+my_path = Retl::Path.new do
+  depends_on(:age_lookup) do   # hint: the block returns the default value
+    { 
+      "adult" => "Adults are 18 or older",
+      "child" => "Children are younger than 18"
+    }
+  end
+
+  path AdultOrChild   # see previous example
+
+  calculate(:age_description) do |row|
+    age_lookup[row[:adult_or_child]]
+  end
+end
+
+result = my_path.transform([{age: 19}])
+result.to_a
+```
+
+##### Dependency Injection
+
+Dependencies can also be injected when the transformation takes place. This is
+useful for testing by passing in mocks or stubs. Also, concrete results from
+other paths can be merged merged into a single path making data integration
+possible.
+
+```
+my_path = Retl::Path.new do
+  depends_on(:age_lookup)   # hint: without a block, the dependency must
+                            # be provided when #transform is called
+  path AdultOrChild
+
+  calculate(:age_description) do |row|
+    age_lookup[row[:adult_or_child]]
+  end
+end
+
+age_lookup_hash = { 
+  "adult" => "Adults are 18 or older",
+  "child" => "Children are younger than 18"
+}
+
+result = my_path.transform([{age: 4}], age_lookup: age_lookup_hash)
+result.to_a
+#=> [ { age: 4, adult_or_child: "child", age_description: "Children are younger than 18" } ]
+```
+
+#### Path Reuse with Dependencies
 
 The `AdultOrChild` path above isn't very flexible. It depends on an `:age` key
 to be present in the hash. What if our data uses a different key, like
@@ -300,9 +323,7 @@ to be present in the hash. What if our data uses a different key, like
 
 ```
 FlexibleAdultOrChild = Retl::Path.new do 
-  depends_on(:from) do |options|
-    options[:from] || (raise ArgumentError, "FlexibleAdultOrChild depends on :from")
-  end
+  depends_on(:from) 
 
   depends_on(:to) do |options|
     options[:to] || :adult_or_child   # use a default value
@@ -318,7 +339,8 @@ path_with_age = Retl::Path.new do
   path FlexibleAdultOrChild, from: :age
 end
 
-path_with_age.transform([{age: 33}]).to_a
+path_with_age_result = path_with_age.transform([{age: 33}])
+path_with_age_result.to_a
 #=> [{age: 33, adult_or_child: "adult"}]
 
 
@@ -328,7 +350,8 @@ path_with_years_since_birth = Retl::Path.new do
   end
 end
 
-path_with_years_since_birth.transform([{years_since_birth: 7}]).to_a
+result = path_with_years_since_birth.transform([{years_since_birth: 7}])
+result.to_a
 #=> [{years_since_birth: 7, age_classification: "child"}]
 ```
 
@@ -346,6 +369,13 @@ path.transform(Enumerable)
 
 Enumerales in, Enumerales out. This makes the application of the gem pretty much
 universal for any type of data transformation requirement in Ruby.
+
+### Next Steps
+
+- Error handling
+- Tracing and logging
+- Extract patterns
+- Load patterns
 
 ## Installation
 

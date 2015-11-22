@@ -266,4 +266,12 @@ describe Retl do
     result.to_a
     expect(result.count).to eq(9)
   end
+
+  it "raises an argument error when a dependency doesn't have a default value" do 
+    path = Retl::Path.new do 
+      depends_on(:something)
+    end
+
+    expect { path.transform([]) }.to raise_error(ArgumentError)
+  end
 end

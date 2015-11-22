@@ -4,7 +4,13 @@ module Retl
   class Context
     def initialize(path, options={})
       path.dependencies.each do |name, dependency|
-        self.class.send(:define_method, name) { dependency.call(options) }
+        if dependency.nil? && !options[name]
+          raise ArgumentError, "This transformation depends on `name`"
+        end
+
+        self.class.send(:define_method, name) do 
+          (dependency && dependency.call(options)) || options[name]
+        end 
       end
 
       @_events = EventRouter.new
