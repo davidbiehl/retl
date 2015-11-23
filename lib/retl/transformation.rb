@@ -1,15 +1,19 @@
 require "retl/context"
 require "retl/fork_data_collector"
+require "retl/error_collector"
 
 module Retl
   class Transformation
     include Enumerable
+
+    attr_reader :errors
     
     def initialize(enumerable, path, options={})
       @enumerable, @path, @options = enumerable, path, options
       @context   = Context.new(@path, @options)
       @fork_data = ForkDataCollector.new(@context)
       @forks     = {}
+      @errors    = ErrorCollector.new(@context)
     end
 
     def each(&block)

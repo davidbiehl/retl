@@ -9,7 +9,7 @@ module Retl
       @context = Context.new(@path, dependencies)
     end
 
-    def push_in(data, context)
+    def call(data, context)
       @context.execute_step(@path, data).each do |result|
         push_out(result)
       end

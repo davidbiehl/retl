@@ -7,7 +7,7 @@ module Retl
       @fork = fork
     end
 
-    def push_in(data, context)
+    def call(data, context)
       context._events.trigger(:fork_data, fork_name: @fork, data: data.dup)
       push_out data
     end

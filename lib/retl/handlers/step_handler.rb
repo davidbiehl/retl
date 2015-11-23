@@ -9,7 +9,7 @@ module Retl
       @step = step
     end
 
-    def push_in(data, context)
+    def call(data, context)
       push_out context.execute_step(step, data)
     end
   end

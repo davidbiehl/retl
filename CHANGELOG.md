@@ -1,5 +1,11 @@
 # Change Log
 
+### 0.0.5
+
+- New Feature: adds a configuration block to alter the behavior of rETL
+- New Feature: error handling. Errors can simple be raised (for development)
+  or be captured so they can be evaluated later (for production)
+
 ### 0.0.4
 
 - Bug Fix: fixes memoized fork results
