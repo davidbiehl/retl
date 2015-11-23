@@ -6,8 +6,12 @@ module Retl
       @input_data, @current_data = input_data, current_data
       @step, @cause = step, cause
 
-      super(cause)
+      super("#{cause} (at step: #{step_description}))")
       set_backtrace(cause.backtrace)
+    end
+
+    def step_description
+      @step.description
     end
   end
 end

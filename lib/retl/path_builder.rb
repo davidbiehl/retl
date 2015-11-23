@@ -4,18 +4,24 @@ require "retl/handlers/filter_handler"
 require "retl/handlers/inspect_handler"
 require "retl/handlers/explode_handler"
 require "retl/handlers/path_handler"
+require "retl/next_description"
 
 
 module Retl
   class PathBuilder
     def initialize(path, &block)
       @path = path
+      @next_descripion = NextDescription.new
       instance_eval(&block)
     end
 
     def step(step=nil, handler: StepHandler, &block)
       step ||= block
-      @path.add_step step, handler: handler
+
+      handler = handler.new(step)
+      handler.description = @next_descripion.take
+      
+      @path.add_handler handler
     end
     alias_method :replace, :step
 
@@ -62,6 +68,10 @@ module Retl
 
     def path(path, dependencies={}, &block)
       @path.add_handler PathHandler.new(path, dependencies, &block)
+    end
+
+    def desc(step_description)
+      @next_descripion.describe_next(step_description)
     end
   end
 end

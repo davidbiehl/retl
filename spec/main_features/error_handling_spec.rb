@@ -5,13 +5,18 @@ describe "Error Handling" do
 
   let(:path) do  
     Retl::Path.new do 
+      desc "calculates the number 4"
       calculate(:four) do |row|
         4
       end
 
+      desc "the description"
       inspect do |row|
         raise StandardError, "David's aren't allowed" if row[:name] == "David"
       end
+
+      desc "calculate the number 5"
+      calculate(:five) { 5 }
     end
   end
 
@@ -64,7 +69,7 @@ describe "Error Handling" do
 
     it "has the cause of the error" do 
       expect(subject.cause).to be_a(StandardError)
-      expect(subject.message).to eq("David's aren't allowed")
+      expect(subject.message).to start_with("David's aren't allowed")
     end
 
     it "has the input data" do 
@@ -74,6 +79,10 @@ describe "Error Handling" do
 
     it "has the current data" do 
       expect(subject.current_data).to include({four: 4})
+    end
+
+    it "will have the step's description" do 
+      expect(subject.step_description).to eq("the description")
     end
   end
 end

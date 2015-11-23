@@ -2,6 +2,9 @@
 
 ### 0.0.5
 
+- New Feature: Step descriptions allow steps to be described while being
+  built. This will allow the description of the step to appear in the 
+  error message if an error occurs.
 - Bug Fix: transform was mutating source data. Instead we just want it to 
   mutate a duplicate and pass that along.
 - New Feature: adds a configuration block to alter the behavior of rETL

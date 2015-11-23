@@ -1,7 +1,10 @@
 module Retl
   class Handler
+    attr_accessor :description
+
     def initialize
-      @output = []
+      @output      = []
+      @description = "unknown"
     end
 
     def output
