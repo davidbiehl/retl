@@ -29,10 +29,8 @@ describe "Dependencies" do
     rspec = self
 
     path = Retl::Path.new do 
-      depends_on(:weather) do |options|
-        options[:weather] || (raise ArgumentError, "This path depends on the weather")
-      end
-
+      depends_on(:weather)
+      
       inspect do |data|
         rspec.expect(weather).to rspec.eq("rainy")
       end

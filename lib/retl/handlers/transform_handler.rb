@@ -3,8 +3,9 @@ require_relative "step_handler"
 module Retl
   class TransformHandler < StepHandler
     def call(data, context)
-      context.execute_step(step, data)
-      push_out data
+      dup = data.dup
+      context.execute_step(step, dup)
+      push_out dup
     end
   end
 end

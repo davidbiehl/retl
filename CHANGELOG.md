@@ -2,6 +2,8 @@
 
 ### 0.0.5
 
+- Bug Fix: transform was mutating source data. Instead we just want it to 
+  mutate a duplicate and pass that along.
 - New Feature: adds a configuration block to alter the behavior of rETL
 - New Feature: error handling. Errors can simple be raised (for development)
   or be captured so they can be evaluated later (for production)

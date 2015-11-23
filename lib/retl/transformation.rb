@@ -1,19 +1,17 @@
 require "retl/context"
 require "retl/fork_data_collector"
-require "retl/error_collector"
+require "retl/errors/step_execution_error"
 
 module Retl
   class Transformation
     include Enumerable
 
-    attr_reader :errors
-    
     def initialize(enumerable, path, options={})
       @enumerable, @path, @options = enumerable, path, options
       @context   = Context.new(@path, @options)
       @fork_data = ForkDataCollector.new(@context)
       @forks     = {}
-      @errors    = ErrorCollector.new(@context)
+      @errors    = []
     end
 
     def each(&block)
@@ -56,13 +54,25 @@ module Retl
       end
     end
 
+    def errors
+      @errors.each
+    end
+
     private
 
     def build_each_result(&block)
       @each ||= @enumerable.reduce([]) do |result, data|
-        @path.call(data, @context).each do |data|
-          yield data if block_given?
-          result << data
+        begin
+          @path.call(data, @context).each do |data|
+            yield data if block_given?
+            result << data
+          end
+        rescue StepExecutionError => e
+          if Retl.configuration.raise_errors
+            raise e
+          else
+            @errors << e
+          end
         end
         result
       end

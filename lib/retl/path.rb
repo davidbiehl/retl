@@ -5,6 +5,7 @@ require "retl/handlers/handler"
 require "retl/handlers/step_handler"
 require "retl/handlers/explode_handler"
 require "retl/handlers/fork_handler"
+require "retl/errors/step_execution_error"
 
 module Retl
   # A Path is a blueprint for transforming data
@@ -106,10 +107,18 @@ module Retl
     # @param context [Context] the execution context for the transformation
     #
     # @return [Array<Hash>] the transformed data
-    def call(data, context=Context.new(self))
-      @steps.reduce([data]) do |queue, handler|
+    def call(input, context=Context.new(self))
+      @steps.reduce([input]) do |queue, handler|
         queue.each do |data|
-          handler.push_in(data, context)
+          begin
+            handler.push_in(data, context)
+          rescue Exception => e
+            raise StepExecutionError.new(
+              input_data: input, 
+              current_data: data, 
+              step: handler
+            )
+          end
         end
         handler.output
       end
