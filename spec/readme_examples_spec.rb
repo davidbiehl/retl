@@ -295,5 +295,76 @@ describe "Readme Examples" do
       expect(path_with_age_result.to_a).to eq([{age: 33, adult_or_child: "adult"}])
       expect(result.to_a).to eq([{years_since_birth: 7, age_classification: "child"}])
     end
+
+    context "Error Handling" do 
+      it "with raise errors = true" do 
+
+        Retl.configure do |config|
+          config.raise_errors = true
+        end
+
+        my_path = Retl::Path.new do 
+          desc "calculates the number 5"
+          calc(:five) { 5 }
+
+          desc "Check for sane ages"
+          transform do |row|
+            raise StandardError, "bad age" if row[:age] > 100 
+          end
+        end
+
+        data = [
+          {age: 33},
+          {age: 3},
+          {age: 1000}
+        ]
+
+        begin
+          result = my_path.transform(data).to_a
+        rescue Retl::StepExecutionError => e
+          e.message
+          #=> bad age (at step: Check for sane ages))
+
+          e.step_description
+          #=> Check for sane ages
+
+          e.input_data
+          #=> {:age=>1000}
+
+          e.current_data
+          #=> {:age=>1000, :five=>5}
+        end
+      end
+
+      it "with raise errors = false" do 
+        Retl.configure do |config|
+          config.raise_errors = false
+        end
+
+        my_path = Retl::Path.new do 
+          desc "calculates the number 5"
+          calc(:five) { 5 }
+
+          desc "Check for sane ages"
+          transform do |row|
+            raise StandardError, "bad age" if row[:age] > 100 
+          end
+        end
+
+        data = [
+          {age: 3},
+          {age: 1000}
+        ]
+
+        result = my_path.transform(data)
+
+        result.to_a
+        #=> [ { age: 3, five: 5 } ]
+
+        result.errors.to_a
+        #=> [ StepExecutionError ]
+      end
+
+    end
   end
 end

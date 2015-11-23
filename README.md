@@ -353,6 +353,76 @@ result.to_a
 #=> [{years_since_birth: 7, age_classification: "child"}]
 ```
 
+### Error Handling
+
+Sometimes errors happen while a step is being performed. By default, errors are
+wrapped in a `StepExecutionError` and the transformation will abort (this
+can be changed with configuration, however). The `StepExecutionError` will
+provide context to aid in debugging the error.
+
+Pay attention to the `desc` step in the path below. `desc` simply describes the
+next step. Not only does this provide good documentation, but the description
+will also be available in the `StepExecutionError` to make debugging easier.
+
+```
+my_path = Retl::Path.new do 
+  desc "calculates the number 5"
+  calc(:five) { 5 }
+
+  desc "Check for sane ages"
+  transform do |row|
+    raise StandardError, "bad age" if row[:age] > 100 
+  end
+end
+
+data = [
+  {age: 33},
+  {age: 3},
+  {age: 1000}
+]
+
+begin
+  result = my_path.transform(data).to_a
+rescue Retl::StepExecutionError => e
+  e.message
+  #=> "bad age (at step: Check for sane ages))"
+
+  e.step_description
+  #=> "Check for sane ages"
+
+  e.input_data
+  #=> { :age => 1000 }
+
+  e.current_data
+  #=> { :age => 1000, :five => 5 }
+end
+```
+
+rETL can be globally configured to continue transforming data despite an error
+like so:
+
+```
+Retl.configure do |config|
+  config.raise_errors = false
+end
+```
+
+With this configuration change, the transformation would continue to process the
+data and errors would be accessible via the `#errors` method on the
+transformation.
+
+```
+# same path and data as above
+
+result = my_path.transform(data)
+
+result.to_a
+#=> [ { age: 3, five: 5 } ]   # the error data isn't in the result
+
+result.errors.to_a
+#=> [ StepExecutionError ]    # the error information is still available, see
+                              # above for use.
+```
 
 ## Roadmap
 
@@ -370,7 +440,6 @@ universal for any type of data transformation requirement in Ruby.
 
 ### Next Steps
 
-- Error handling
 - Tracing and logging
 - Extract patterns
 - Load patterns
