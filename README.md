@@ -424,6 +424,17 @@ result.errors.to_a
                               # above for use.
 ```
 
+### Multi-Thread Support
+
+Since extracting and loading can be I/O intense operations, it makes sense
+to run them in their own threads. This can be done with the `Path#transform!`
+method. It works just like `Path#transform` only it will separate extration,
+transformation and loading into separate threads.
+
+```
+path.transform!(data)
+```
+
 ## Roadmap
 
 Currently the rETL gem's strengths are transforming data and code reuse. However
