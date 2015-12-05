@@ -31,19 +31,42 @@ describe Retl do
     end
   end
 
-  it "memoizes the transformation result" do 
-    path = Retl::Path.new do 
-      transform TypeTransformation
-      explode do |data|
-        3.times.map do |i|
-          data[:set] = i
-          data
+  it "supports threading across the ETL chain" do 
+    class SlowDown
+      include Enumerable
+
+      def initialize(enum)
+        @enum = enum
+      end
+
+      def each
+        @enum.each do |item|
+          yield(item)
+          sleep 0.1
         end
       end
     end
 
-    result = path.transform(source)
-    result.to_a
-    expect(result.count).to eq(9)
+    class SlowWrite
+      def <<(row)
+        sleep 0.1
+      end
+    end
+
+    path = Retl::Path.new do 
+      inspect do |row|
+        sleep 0.1
+      end
+    end
+
+    slow_source = SlowDown.new(source)
+
+    start = Time.now
+    result = path.transform!(slow_source)
+    result.load_into(SlowWrite.new)
+    elapsed = Time.now - start
+
+    expect(elapsed).to be < 0.6
+    expect(result.to_a).to eq(source.to_a)
   end
 end

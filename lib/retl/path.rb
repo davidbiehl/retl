@@ -186,5 +186,11 @@ module Retl
     def transform(enumerable, options={})
       Transformation.new(enumerable, self, options)
     end
+
+    def transform!(enumerable, options={})
+      transform(enumerable, options).tap do |transformation|
+        transformation.execution_strategy = ThreadedExecution
+      end
+    end
   end
 end

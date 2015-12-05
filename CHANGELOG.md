@@ -1,7 +1,11 @@
 # Change Log
 
-### HEAD
+### 0.0.6
 
+- Improvement: No longer attempts to memoize transformation results. If you
+  want to re-iterate over the results, store them with `#to_a`
+- New Feature: adds support for horizontal threading between the source
+  and the transformation and the transformation and the load. 
 - Bug Fix: Defines single methods for dependencies on a Context instead
   of insteance methods for the whole class
 
