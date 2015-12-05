@@ -8,7 +8,7 @@ module Retl
           raise ArgumentError, "This transformation depends on `name`"
         end
 
-        self.class.send(:define_method, name) do 
+        define_singleton_method(name) do 
           (dependency && dependency.call(options)) || options[name]
         end 
       end

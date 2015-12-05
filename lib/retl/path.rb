@@ -139,6 +139,9 @@ module Retl
     # @return [void]
     def add_fork(name, &block)
       fork = Path.new(&block)
+      @dependencies.each do |name, dependency|
+        fork.add_dependency name, dependency
+      end
       add_handler ForkHandler.new(name)
       @forks[name] = fork 
     end

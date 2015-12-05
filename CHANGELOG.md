@@ -1,5 +1,10 @@
 # Change Log
 
+### HEAD
+
+- Bug Fix: Defines single methods for dependencies on a Context instead
+  of insteance methods for the whole class
+
 ### 0.0.5
 
 - New Feature: Step descriptions allow steps to be described while being
