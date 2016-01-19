@@ -46,10 +46,9 @@ module Retl
     #
     # @param parent [Path] - a Path to inherit from
     def initialize(parent=nil, &block)
-      @steps         = []
-      @dependencies  = {}
-      @forks         = {}
-      @fork_builders = {}
+      @steps        = []
+      @dependencies = {}
+      @forks        = {}
 
       if parent
         @dependencies = parent.dependencies.dup
@@ -72,9 +71,8 @@ module Retl
     # as well. That was if additional steps are added to the original Path
     # they won't be part of the copied Path.
     def initialize_copy(source)
-      @steps         = source.steps.dup
-      @forks         = {}
-      @fork_builders = {}
+      @steps = source.steps.dup
+      @forks = {}
     end
 
     # Adds a step to the Path
@@ -153,17 +151,6 @@ module Retl
     # @return [Path] the forked path
     def forks(name)
       @forks[name]
-    end
-
-    # Adds a fork builder block
-    #
-    # @param name   [Symbol] the name of the fork to build
-    # @param &block [Block]  the block that builds the fork
-    #
-    # @return [Fork] the built fork
-    def add_fork_builder(name, &block)
-      @fork_builders[name] = block
-      add_fork(name, &block)
     end
 
     # Adds a depdency to the Path

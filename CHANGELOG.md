@@ -1,5 +1,10 @@
 # Change Log
 
+### 0.0.7
+
+- Improvement: Removes the `Path#add_fork_builder` method, which was not 
+  necessary.
+
 ### 0.0.6
 
 - Improvement: No longer attempts to memoize transformation results. If you
