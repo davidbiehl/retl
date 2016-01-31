@@ -1,10 +1,10 @@
 require "spec_helper"
 require_relative "handlers_context"
 
-describe Retl::TransformHandler do 
-  include_context :handlers
+describe Retl::TransformStep do 
+  include_context :steps
 
-  subject { Retl::TransformHandler.new(step) }
+  subject { Retl::StepHandler.new Retl::TransformStep.new(step) }
   let(:step) { Proc.new { |data, context| data[:meniacal_laughter] = "hahaha!"} }
 
   it "changes the source data" do 
@@ -13,5 +13,5 @@ describe Retl::TransformHandler do
     expect(subject.output.first).to include(meniacal_laughter: "hahaha!")
   end
 
-  it_behaves_like "a handler"
+  it_behaves_like "a step"
 end

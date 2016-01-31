@@ -1,9 +1,9 @@
-require "retl/handlers/step_handler"
-require "retl/handlers/transform_handler"
-require "retl/handlers/filter_handler"
-require "retl/handlers/inspect_handler"
-require "retl/handlers/explode_handler"
-require "retl/handlers/path_handler"
+require "retl/steps/transform_step"
+require "retl/steps/filter_step"
+require "retl/steps/inspect_step"
+require "retl/steps/explode_step"
+require "retl/steps/path_step"
+require "retl/steps/replace_step"
 require "retl/next_description"
 
 
@@ -15,24 +15,17 @@ module Retl
       instance_eval(&block)
     end
 
-    def step(step=nil, handler: StepHandler, &block)
-      step ||= block
-
-      handler = handler.new(step)
-      handler.description = @next_descripion.take
-      
-      @path.add_handler handler
+    def step(step=nil, &block)
+      @path.add_step(ReplaceStep.new(step || block), @next_descripion.take)
     end
     alias_method :replace, :step
 
     def transform(action=nil, &block)
-      action ||= block
-      step(action, handler: TransformHandler)
+      @path.add_step(TransformStep.new(action || block), @next_descripion.take)
     end
 
     def filter(predicate=nil, &block)
-      predicate ||= block
-      step(predicate, handler: FilterHandler)
+      @path.add_step(FilterStep.new(predicate || block), @next_descripion.take)
     end
     alias_method :select, :filter
 
@@ -41,8 +34,7 @@ module Retl
     end
 
     def inspect(action=nil, &block)
-      action ||= block
-      step(action, handler: InspectHandler)
+      @path.add_step(InspectStep.new(action || block), @next_descripion.take)
     end
 
     def reject(predicate=nil, &block)
@@ -62,12 +54,11 @@ module Retl
     end
 
     def explode(action=nil, &block)
-      action ||= block
-      step(action, handler: ExplodeHandler)
+      @path.add_step(ExplodeStep.new(action || block), @next_descripion.take)
     end
 
     def path(path, dependencies={}, &block)
-      @path.add_handler PathHandler.new(path, dependencies, &block)
+      @path.add_step(PathStep.new(path, dependencies, &block), @next_descripion.take)
     end
 
     def desc(step_description)

@@ -1,9 +1,6 @@
-require_relative "handler"
-
 module Retl
-  class PathHandler < Handler
+  class PathStep
     def initialize(path, dependencies={}, &block)
-      super()
       @path = path
       dependencies.merge!(block.call) if block
       @context = Context.new(@path, dependencies)
@@ -11,7 +8,7 @@ module Retl
 
     def call(data, context)
       @context.execute_step(@path, data).each do |result|
-        push_out(result)
+        yield result
       end
     end
   end

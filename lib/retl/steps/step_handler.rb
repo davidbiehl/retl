@@ -1,10 +1,11 @@
 module Retl
-  class Handler
+  class StepHandler
     attr_accessor :description
 
-    def initialize
+    def initialize(step, description = "unknown")
       @output      = []
-      @description = "unknown"
+      @description = description
+      @step        = step
     end
 
     def output
@@ -12,11 +13,9 @@ module Retl
     end
 
     def push_in(data, context)
-      call(data, context)
-    end
-
-    def call(data, context)
-      raise NotImplementedError, "Handlers much implement the #push_in(data, context) method"
+      @step.call(data, context) do |result|
+        push_out result
+      end
     end
 
     private

@@ -1,10 +1,10 @@
 require "spec_helper"
 require_relative "handlers_context"
 
-describe Retl::ForkHandler do 
-  include_context :handlers
+describe Retl::ForkStep do 
+  include_context :steps
 
-  subject { Retl::ForkHandler.new(:my_fork) }
+  subject { Retl::StepHandler.new Retl::ForkStep.new(:my_fork) }
 
   it "triggers a fork_data event on the context" do 
     context._events.listen_to(:fork_data) do |args|
@@ -21,5 +21,5 @@ describe Retl::ForkHandler do
     expect(subject.output).to eq([data])
   end
 
-  it_behaves_like "a handler"
+  it_behaves_like "a step"
 end

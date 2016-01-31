@@ -1,10 +1,10 @@
 require "spec_helper"
 require_relative "handlers_context"
 
-describe Retl::FilterHandler do 
-  include_context :handlers
+describe Retl::FilterStep do 
+  include_context :steps
 
-  subject { Retl::FilterHandler.new(step) }
+  subject { Retl::StepHandler.new Retl::FilterStep.new(step) }
   let(:step) { Proc.new { |data, context| data[:name] == "David"} }
 
   it "pushes out data that matches the filter" do 
@@ -20,5 +20,5 @@ describe Retl::FilterHandler do
     expect(subject.output).to eq([])
   end
 
-  it_behaves_like "a handler"
+  it_behaves_like "a step"
 end
