@@ -8,6 +8,11 @@
 rETL is a gem with a rich DSL for ETL (extract, transform, load) projects in 
 Ruby.
 
+## Warning!
+
+This gem is a work in progress and the API is subject to change. Please use
+at your own risk! The API and DSL will stabilize on version 0.1.0.
+
 ## Transforming Data
 
 The core construct for transforming data is called a **Path**. A path describes
