@@ -1,10 +1,8 @@
 require "retl/path_builder"
 require "retl/transformation"
 require "retl/context"
-require "retl/handlers/handler"
-require "retl/handlers/step_handler"
-require "retl/handlers/explode_handler"
-require "retl/handlers/fork_handler"
+require "retl/steps/step_handler"
+require "retl/steps/fork_step"
 require "retl/errors/step_execution_error"
 
 module Retl
@@ -85,12 +83,8 @@ module Retl
     # @param step [#call(data)] the step to take
     #
     # @return [void]
-    def add_step(step, handler: StepHandler)
-      add_handler handler.new(step)
-    end
-
-    def add_handler(handler)
-      @steps << handler
+    def add_step(step, description="unknown")
+      @steps << StepHandler.new(step, description)
     end
 
     # Execuutes the Path with the given data
@@ -140,7 +134,7 @@ module Retl
       @dependencies.each do |name, dependency|
         fork.add_dependency name, dependency
       end
-      add_handler ForkHandler.new(name)
+      add_step ForkStep.new(name)
       @forks[name] = fork 
     end
 

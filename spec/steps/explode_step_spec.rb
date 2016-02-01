@@ -1,10 +1,10 @@
 require "spec_helper"
 require_relative "handlers_context"
 
-describe Retl::ExplodeHandler do 
-  include_context :handlers
+describe Retl::ExplodeStep do 
+  include_context :steps
 
-  subject { Retl::ExplodeHandler.new(step) }
+  subject { Retl::StepHandler.new Retl::ExplodeStep.new(step) }
   let(:step) { Proc.new { |data, context| data.times.map { |x| x + x } } }
   let(:data) { 3 }
 
@@ -14,5 +14,5 @@ describe Retl::ExplodeHandler do
     expect(subject.output).to eq([0, 2, 4])
   end
 
-  it_behaves_like "a handler"
+  it_behaves_like "a step"
 end
