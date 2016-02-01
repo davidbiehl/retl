@@ -16,16 +16,19 @@ module Retl
     end
 
     def step(step=nil, &block)
-      @path.add_step(ReplaceStep.new(step || block), @next_descripion.take)
+      @path.add_step(step || block, @next_descripion.take)
     end
-    alias_method :replace, :step
+
+    def replace(action=nil, &block)
+      step(ReplaceStep.new(action || block))
+    end
 
     def transform(action=nil, &block)
-      @path.add_step(TransformStep.new(action || block), @next_descripion.take)
+      step(TransformStep.new(action || block))
     end
 
     def filter(predicate=nil, &block)
-      @path.add_step(FilterStep.new(predicate || block), @next_descripion.take)
+      step(FilterStep.new(predicate || block))
     end
     alias_method :select, :filter
 
@@ -34,7 +37,7 @@ module Retl
     end
 
     def inspect(action=nil, &block)
-      @path.add_step(InspectStep.new(action || block), @next_descripion.take)
+      step(InspectStep.new(action || block))
     end
 
     def reject(predicate=nil, &block)
@@ -54,11 +57,11 @@ module Retl
     end
 
     def explode(action=nil, &block)
-      @path.add_step(ExplodeStep.new(action || block), @next_descripion.take)
+      step(ExplodeStep.new(action || block))
     end
 
     def path(path, dependencies={}, &block)
-      @path.add_step(PathStep.new(path, dependencies, &block), @next_descripion.take)
+      step(PathStep.new(path, dependencies, &block))
     end
 
     def desc(step_description)
